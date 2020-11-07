@@ -1,16 +1,23 @@
 {
-  "name": "sampleproj",
-  "version": "0.0.0",
-  "private": true,
+  "name": "starter-snake-node",
+  "version": "1.0.0",
+  "description": "A simple Battlesnake written in JavaScript for Node.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BattlesnakeOfficial/starter-snake-node.git"
+  },
+  "author": "BattlesnakeOfficial",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BattlesnakeOfficial/starter-snake-node/issues"
+  },
+  "homepage": "https://github.com/BattlesnakeOfficial/starter-snake-node#readme",
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "express": "~4.16.1",
-    "http-errors": "~1.6.3",
-    "jade": "~1.11.0",
-    "morgan": "~1.9.1"
+    "express": "^4.17.1"
   }
 }

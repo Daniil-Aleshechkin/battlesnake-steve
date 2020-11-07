@@ -1,8 +1,20 @@
-var express = require('express');
-var router = express.Router();
+const bodyParser = require('body-parser')
+const express = require('express')
 
-/* BattleSnake code goes here */
-router.get('/', function(req, res, next) {
+const PORT = process.env.PORT || 3000
+
+const app = express()
+app.use(bodyParser.json())
+
+app.get('/', handleIndex)
+app.post('/start', handleStart)
+app.post('/move', handleMove)
+app.post('/end', handleEnd)
+
+app.listen(PORT, () => console.log(`Battlesnake Server listening at http://127.0.0.1:${PORT}`))
+
+
+function handleIndex(request, response) {
   var battlesnakeInfo = {
     apiversion: '1',
     author: '',
@@ -11,17 +23,16 @@ router.get('/', function(req, res, next) {
     tail: 'default'
   }
   response.status(200).json(battlesnakeInfo)
+}
 
-});
-
-router.get('/', function(req, res, next) {
+function handleStart(request, response) {
   var gameData = request.body
 
   console.log('START')
   response.status(200).send('ok')
-});
+}
 
-router.get('/', function(req, res, next) {
+function handleMove(request, response) {
   var gameData = request.body
 
   var possibleMoves = ['up', 'down', 'left', 'right']
@@ -31,13 +42,11 @@ router.get('/', function(req, res, next) {
   response.status(200).send({
     move: move
   })
-});
+}
 
-router.get('/', function(req, res, next) {
+function handleEnd(request, response) {
   var gameData = request.body
 
   console.log('END')
   response.status(200).send('ok')
-});
-
-module.exports = router;
+}
