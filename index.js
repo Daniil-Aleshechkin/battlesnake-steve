@@ -34,9 +34,11 @@ function handleStart(request, response) {
 
 function handleMove(request, response) {
   var gameData = request.body
-
+  
+  //This logs the closest food (in terms of manhatten distance, not euclidian)
+  console.log(shortestManhattenDistance(gameData.board.food, gameData.you.body[0].x, gameData.you.body[0].y));
   var possibleMoves = ['up', 'down', 'left', 'right']
-  var move = possibleMove[3]
+  var move = possibleMoves[3]
 
   console.log('MOVE: ' + move)
   response.status(200).send({
@@ -46,7 +48,25 @@ function handleMove(request, response) {
 
 function handleEnd(request, response) {
   var gameData = request.body
-
   console.log('END')
   response.status(200).send('ok')
+}
+
+//This function calculates the shortest manhatten distance between the snakes head and all pieces of food on the board.
+//NOTE:This function currently does not take into account that there may be walls(enemy snakes) between the snake and the pieces of food.
+function shortestManhattenDistance(foodArray, yourHeadX, yourHeadY){
+  var shortestMHD;
+  for(var i = 0; i < foodArray.length; i++){
+      var MHD;
+      MHD = Math.abs(foodArray[i].x - yourHeadX) + Math.abs(foodArray[i].y - yourHeadY);
+      if(i === 0){
+          shortestMHDIndex = i;
+          shortestMHD = MHD;
+      } else {
+          if(MHD < shortestMHD){
+              shortestMHD = MHD;
+          }
+      }
+  }
+  return shortestMHD;
 }
