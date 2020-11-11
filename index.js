@@ -1,7 +1,8 @@
 const bodyParser = require('body-parser')
 const express = require('express')
 const aStar = require('./aStar.js')
-const noPathMove = require('./noPathMove')
+const availableMoves = require('./availableMoves')
+const twoMoveAlgorithm = require('./twoMoveAlgorithm')
 
 const PORT = process.env.PORT || 3000
 
@@ -36,17 +37,45 @@ function handleStart(request, response) {
 
 function handleMove(request, response) {
   var gameData = request.body
+  var move;
 
-  // var possibleMoves = ['up', 'down', 'left', 'right']
-  // var move = possibleMoves[3]
+  console.log('Current move #: '+gameData.turn);
   var grid = generateGrid(gameData);
-  var move = aStar.aStar(gameData, grid);
+  
+  //movesArray is an array of ['move', number of moves, left(false/true), right(false/true), up(false/true), down(false/true)]
+  var movesArray = availableMoves.possibleMoves(gameData);
+
+  if(movesArray[1] === 2){
+    //two move algorithm
+    console.log('Two Move Algorithm');
+    move = twoMoveAlgorithm.algorithm(gameData, grid, movesArray);
+    if(move == 'useAStar'){
+      console.log('Two Move not necessary, use AStar');
+      move = aStar.aStar(gameData, grid);
+      if(move == 'noPath'){
+        console.log('A* Algorithm No Path');
+        move = movesArray[0];
+      }
+    }
+
+  } else if (movesArray[1] === 3 || movesArray[1] === 4){
+    console.log('A* Algorithm');
+    move = aStar.aStar(gameData, grid);
+    if(move == 'noPath'){
+      console.log('A* Algorithm No Path');
+      move = movesArray[0];
+    }
+
+  } else {
+    console.log('One Move');
+    move = movesArray[0];
+  }
 
   //If there is no possible path between the snake and the food, then just move right. Eventually will add a 
   //function to handle a move here. Likely just move wherever there is no snake(if applicable).
-  if(move == 'noPath'){
-    move = noPathMove.noPath(gameData);
-  }
+  // if(move == 'noPath'){
+  //   move = noPathMove.noPath(gameData);
+  // }
 
   console.log('MOVE: ' + move)
   response.status(200).send({
@@ -80,6 +109,7 @@ function generateGrid(gameState){
       this.neighbours = [];
       this.previous = undefined;
       this.wall = false;
+      this.counted = false;
   
       //If the node is either an enemy snake, or its own body, count as a wall.
       for(var x = 0; x < gameState.you.body.length; x++){

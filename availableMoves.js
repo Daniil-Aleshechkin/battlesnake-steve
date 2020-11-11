@@ -1,10 +1,13 @@
 //If there is no possible path for the snake to go to a piece of food, this function will return it a safe move to make if possible.
-function noPathMove(gameState){
+function availableMoves(gameState){
     var left = true;
     var right = true;
     var up = true;
     var down = true;
-  
+    var numMoves = 0;
+    var returnArr = ['up', numMoves, left, right, up, down];
+
+
     //If moving in any direction is off the board, make those directions false.
     if(gameState.you.body[0].x + 1 == gameState.board.width){
       right = false;
@@ -94,12 +97,17 @@ function noPathMove(gameState){
         }
       }
     }
+
+    if(right == true){numMoves++}
+    if(left == true){numMoves++}
+    if(up == true){numMoves++}
+    if(down == true){numMoves++}
     
-    if(right == true){return 'right'}
-    if(left == true){return 'left'}
-    if(up == true){return 'up'}
-    if(down == true){return 'down'}
-    return 'up';
+    if(right == true){returnArr = ['right', numMoves, left, right, up, down]; return returnArr}
+    if(left == true){returnArr = ['left', numMoves, left, right, up, down]; return returnArr}
+    if(up == true){returnArr = ['up', numMoves, left, right, up, down]; return returnArr}
+    if(down == true){returnArr = ['down', numMoves, left, right, up, down]; return returnArr}
+    return returnArr;
   }
   
-module.exports = {"noPath": noPathMove};  
+module.exports = {"possibleMoves": availableMoves};  
