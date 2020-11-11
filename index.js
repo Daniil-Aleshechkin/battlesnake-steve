@@ -37,8 +37,6 @@ function handleStart(request, response) {
 function handleMove(request, response) {
   var gameData = request.body
 
-  // var possibleMoves = ['up', 'down', 'left', 'right']
-  // var move = possibleMoves[3]
   var grid = generateGrid(gameData);
   var move = aStar.aStar(gameData, grid);
 
