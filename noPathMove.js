@@ -102,4 +102,4 @@ function noPathMove(gameState){
     return 'up';
   }
   
-module.exports = {"noMove": noPathMove};  
+module.exports = {"noPath": noPathMove};  
