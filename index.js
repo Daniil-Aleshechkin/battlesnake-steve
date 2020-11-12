@@ -3,6 +3,8 @@ const express = require('express')
 const aStar = require('./aStar.js')
 const availableMoves = require('./availableMoves')
 const twoMoveAlgorithm = require('./twoMoveAlgorithm')
+const kdTree = require("./kdTree")
+const { kdTreeRemoveElem, buildKDTree } = require('./kdTree')
 
 const PORT = process.env.PORT || 3000
 
@@ -15,7 +17,6 @@ app.post('/move', handleMove)
 app.post('/end', handleEnd)
 
 app.listen(PORT, () => console.log(`Battlesnake Server listening at http://127.0.0.1:${PORT}`))
-
 
 function handleIndex(request, response) {
   var battlesnakeInfo = {
@@ -30,6 +31,7 @@ function handleIndex(request, response) {
 
 function handleStart(request, response) {
   var gameData = request.body
+  console.log(gameData.board.food)
 
   console.log('START')
   response.status(200).send('ok')
@@ -41,6 +43,10 @@ function handleMove(request, response) {
 
   console.log('Current move #: '+gameData.turn);
   var grid = generateGrid(gameData);
+  //Generate all the nearest food
+  for (let n = 0 ; n < gameData.board.food.length ; n++) {
+    grid[gameData.board.food[n].x][gameData.board.food[n].y].obtainNearestFood(grid,gameData.board.food)
+  }
   
   //movesArray is an array of ['move', number of moves, left(false/true), right(false/true), up(false/true), down(false/true)]
   var movesArray = availableMoves.possibleMoves(gameData);
@@ -90,70 +96,87 @@ function handleEnd(request, response) {
 }
 
 function generateGrid(gameState){
-  var cols = gameState.board.width;
-    var rows = gameState.board.height;
-    var grid = new Array(cols);
+  const foodTree = buildKDTree(gameState.board.food)
+  const cols = gameState.board.width;
+  const rows = gameState.board.height;
+  var grid = new Array(cols);
   
-    //Creating the grid.
-    for(var i = 0; i < cols; i++){
-      grid[i] = new Array(rows);
+  //Creating the grid.
+  for(var i = 0; i < cols; i++){
+    grid[i] = new Array(rows);
+  }
+
+  //Data for each node.
+  function Spot(i, j){
+    this.f = 0;
+    this.g = 0;
+    this.h = 0;
+    this.i = i;
+    this.j = j;
+    this.neighbours = [];
+    this.nearestFood = null;
+    this.previous = undefined;
+    this.wall = false;
+    this.counted = false;
+    this.food = null
+    
+    //If the node is either an enemy snake, or its own body, count as a wall.
+    for(var x = 0; x < gameState.you.body.length; x++){
+      if(this.i === gameState.you.body[x].x && this.j ===  gameState.you.body[x].y){
+        this.wall = true;
+      }
     }
-  
-    //Data for each node.
-    function Spot(i, j){
-      this.f = 0;
-      this.g = 0;
-      this.h = 0;
-      this.i = i;
-      this.j = j;
-      this.neighbours = [];
-      this.previous = undefined;
-      this.wall = false;
-      this.counted = false;
-  
-      //If the node is either an enemy snake, or its own body, count as a wall.
-      for(var x = 0; x < gameState.you.body.length; x++){
-        if(this.i === gameState.you.body[x].x && this.j ===  gameState.you.body[x].y){
+    for(var x = 0; x < gameState.board.snakes.length; x++){
+      for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
+        if(this.i === gameState.board.snakes[x].body[y].x && this.j === gameState.board.snakes[x].body[y].y){
           this.wall = true;
         }
       }
-  
-      for(var x = 0; x < gameState.board.snakes.length; x++){
-        for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
-          if(this.i === gameState.board.snakes[x].body[y].x && this.j === gameState.board.snakes[x].body[y].y){
-            this.wall = true;
-          }
-        }
-      }
-      
-      this.addNeighbours = function(grid){
-        if(i < cols - 1) {
-          this.neighbours.push(grid[this.i+1][j])
-        }
-        if(i > 0) {
-          this.neighbours.push(grid[this.i-1][j])
-        }
-        if(j < rows - 1) {
-          this.neighbours.push(grid[this.i][j+1])
-        }
-        if(j > 0) {
-          this.neighbours.push(grid[this.i][j-1])
-        }
+    }
+    this.obtainNearestFood  = function (foodTree) {
+      console.log(this.food,"FOOD")
+      tree = kdTreeRemoveElem(foodTree,this.food)
+      this.nearestFood = kdTree.kdTreeClostestPoint(tree,[this.food.x,this.food.y])
+      console.log(this.nearestFood)
+      if (this.nearestFood != null) {
+        console.log(`The nearest food of (${this.i}, ${this.j}) is (${this.nearestFood.x},${this.nearestFood.y})`)
       }
     }
-  
-    //Each node is created in a grid.
-    for(var i = 0; i < cols; i++){
-      for(var j = 0; j < rows; j++){
-        grid[i][j] = new Spot(i, j);
+    
+    this.addNeighbours = function(grid){
+      if(i < cols - 1) {
+        this.neighbours.push(grid[this.i+1][j])
+      }
+      if(i > 0) {
+        this.neighbours.push(grid[this.i-1][j])
+      }
+      if(j < rows - 1) {
+        this.neighbours.push(grid[this.i][j+1])
+      }
+      if(j > 0) {
+        this.neighbours.push(grid[this.i][j-1])
       }
     }
-  
-    //Surrounding nodes are collected for each node.
-    for(var i = 0; i < cols; i++){
-      for(var j = 0; j < rows; j++){
-        grid[i][j].addNeighbours(grid);
-      }
+  }
+
+  //Each node is created in a grid.
+  for(var i = 0; i < cols; i++){
+    for(var j = 0; j < rows; j++){
+      grid[i][j] = new Spot(i, j);
     }
+  }
+
+  //Create the nearest food data for all food
+  for(let i = 0; i < gameState.board.food.length; i++) {
+    grid[gameState.board.food[i].x][gameState.board.food[i].y].food = gameState.board.food[i]
+    grid[gameState.board.food[i].x][gameState.board.food[i].y].obtainNearestFood(foodTree)
+  }
+
+  //Surrounding nodes are collected for each node.
+  for(var i = 0; i < cols; i++){
+    for(var j = 0; j < rows; j++){
+      grid[i][j].addNeighbours(grid);
+    }
+  }
   return grid;
 }
