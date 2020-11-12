@@ -100,7 +100,7 @@ function generateGrid(gameState){
   const cols = gameState.board.width;
   const rows = gameState.board.height;
   var grid = new Array(cols);
-  
+  console.log(foodTree)
   //Creating the grid.
   for(var i = 0; i < cols; i++){
     grid[i] = new Array(rows);
@@ -135,11 +135,16 @@ function generateGrid(gameState){
     }
     this.obtainNearestFood  = function (foodTree) {
       console.log(this.food,"FOOD")
-      tree = kdTreeRemoveElem(foodTree,this.food)
+      let tree = kdTreeRemoveElem(foodTree,this.food)
+      if (gameState.turn <3) {
+        console.log(JSON.stringify(tree,null,4),"REMOVED")
+      
+      }
       this.nearestFood = kdTree.kdTreeClostestPoint(tree,[this.food.x,this.food.y])
-      console.log(this.nearestFood)
       if (this.nearestFood != null) {
         console.log(`The nearest food of (${this.i}, ${this.j}) is (${this.nearestFood.x},${this.nearestFood.y})`)
+      } else {
+        console.log("Null")
       }
     }
     

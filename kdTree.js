@@ -162,7 +162,7 @@ function kdTreeRemoveElem(root,spot,depth=0) {
     }
 
     let axis = depth%2
-    if (root.spot == spot) {
+    if (root.spot.x == spot.x && root.spot.y == spot.y) {
         //Spot is found
         if (root.right != null) { // Replace the spot with the min from the tree
             root.spot = findMin(root,axis,depth)
