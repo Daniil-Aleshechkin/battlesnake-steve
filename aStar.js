@@ -1,13 +1,12 @@
 //This function calculates the shortest manhatten distance between the snakes head and all pieces of food on the board.
-function shortestManhattenDistance(gameState,grid){
+function shortestManhattenDistance(gameState,nearestFoods){
     var shortestMHD;
     var shortestMHDIndex;
     for(var i = 0; i < gameState.board.food.length; i++){
         var MHD;
         MHD = Math.abs(gameState.board.food[i].x - gameState.you.body[0].x) + Math.abs(gameState.board.food[i].y - gameState.you.body[0].y);
-        if (gameState.board.food.length >1) {
-          console.log(grid[gameState.board.food[i].x][gameState.board.food[i].y].nearestFood,grid[gameState.board.food[i].x][gameState.board.food[i].y].i,grid[gameState.board.food[i].x][gameState.board.food[i].y].j,gameState.board.food[i].x,gameState.board.food[i].y)
-          MHD += Math.abs(gameState.board.food[i].x - grid[gameState.board.food[i].x][gameState.board.food[i].y].nearestFood.x) + Math.abs(gameState.board.food[i].y - grid[gameState.board.food[i].x][gameState.board.food[i].y].nearestFood.y);
+        if (nearestFoods.length >1) {
+          MHD += Math.abs(nearestFoods[i][0].x-nearestFoods[i][1].x) + Math.abs(nearestFoods[i][0].y-nearestFoods[i][1].y);
         }
         if(i === 0){
             shortestMHDIndex = i;
@@ -23,8 +22,8 @@ function shortestManhattenDistance(gameState,grid){
   }
 
 //This function uses A* pathfinding to find the best possible path to the closest piece of food.
-function foodPathing(gameState, grid){
-    var foodIndex = shortestManhattenDistance(gameState,grid);
+function foodPathing(gameState, grid, nearestFoods){
+    var foodIndex = shortestManhattenDistance(gameState,nearestFoods);
     var openSet = [];
     var closedSet = [];
     var path;

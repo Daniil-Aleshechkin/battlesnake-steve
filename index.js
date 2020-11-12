@@ -43,13 +43,11 @@ function handleMove(request, response) {
 
   console.log('Current move #: '+gameData.turn);
   var grid = generateGrid(gameData);
-  //Generate all the nearest food
-  for (let n = 0 ; n < gameData.board.food.length ; n++) {
-    grid[gameData.board.food[n].x][gameData.board.food[n].y].obtainNearestFood(grid,gameData.board.food)
-  }
   
   //movesArray is an array of ['move', number of moves, left(false/true), right(false/true), up(false/true), down(false/true)]
   var movesArray = availableMoves.possibleMoves(gameData);
+  //genarate an array of the nearest paths of food
+  var nearestFoods = generateFoods(gameData);
 
   if(movesArray[1] === 2){
     //two move algorithm
@@ -57,7 +55,7 @@ function handleMove(request, response) {
     move = twoMoveAlgorithm.algorithm(gameData, grid, movesArray);
     if(move == 'useAStar'){
       console.log('Two Move not necessary, use AStar');
-      move = aStar.aStar(gameData, grid);
+      move = aStar.aStar(gameData, grid,nearestFoods);
       if(move == 'noPath'){
         console.log('A* Algorithm No Path');
         move = movesArray[0];
@@ -66,7 +64,7 @@ function handleMove(request, response) {
 
   } else if (movesArray[1] === 3 || movesArray[1] === 4){
     console.log('A* Algorithm');
-    move = aStar.aStar(gameData, grid);
+    move = aStar.aStar(gameData, grid,nearestFoods);
     if(move == 'noPath'){
       console.log('A* Algorithm No Path');
       move = movesArray[0];
@@ -96,11 +94,10 @@ function handleEnd(request, response) {
 }
 
 function generateGrid(gameState){
-  const foodTree = buildKDTree(gameState.board.food)
   const cols = gameState.board.width;
   const rows = gameState.board.height;
   var grid = new Array(cols);
-  console.log(foodTree)
+
   //Creating the grid.
   for(var i = 0; i < cols; i++){
     grid[i] = new Array(rows);
@@ -133,20 +130,6 @@ function generateGrid(gameState){
         }
       }
     }
-    this.obtainNearestFood  = function (foodTree) {
-      console.log(this.food,"FOOD")
-      let tree = kdTreeRemoveElem(foodTree,this.food)
-      if (gameState.turn <3) {
-        console.log(JSON.stringify(tree,null,4),"REMOVED")
-      
-      }
-      this.nearestFood = kdTree.kdTreeClostestPoint(tree,[this.food.x,this.food.y])
-      if (this.nearestFood != null) {
-        console.log(`The nearest food of (${this.i}, ${this.j}) is (${this.nearestFood.x},${this.nearestFood.y})`)
-      } else {
-        console.log("Null")
-      }
-    }
     
     this.addNeighbours = function(grid){
       if(i < cols - 1) {
@@ -171,11 +154,6 @@ function generateGrid(gameState){
     }
   }
 
-  //Create the nearest food data for all food
-  for(let i = 0; i < gameState.board.food.length; i++) {
-    grid[gameState.board.food[i].x][gameState.board.food[i].y].food = gameState.board.food[i]
-    grid[gameState.board.food[i].x][gameState.board.food[i].y].obtainNearestFood(foodTree)
-  }
 
   //Surrounding nodes are collected for each node.
   for(var i = 0; i < cols; i++){
@@ -184,4 +162,30 @@ function generateGrid(gameState){
     }
   }
   return grid;
+}
+
+function removeFromArray(arr, element){
+  for(var i = arr.length - 1; i >= 0; i--){
+    if(arr[i].x == element.x && arr[i].y == element.y){
+      arr.splice(i, 1);
+    }
+  }
+}
+
+function generateFoods(gameData) {
+  const foodLocations = JSON.parse(JSON.stringify(gameData.board.food))
+  var nearestFoods = []
+  for(let i = 0; i < foodLocations.length; i++) {
+    var newFood = JSON.parse(JSON.stringify(foodLocations))
+    if (foodLocations.length <= 1) {
+      break
+    }
+    removeFromArray(newFood,foodLocations[i])
+    let tree = kdTree.buildKDTree(newFood)
+    let nearestFood = kdTree.kdTreeClostestPoint(tree,[foodLocations[i].x,foodLocations[i].y])
+    console.log(`NEAREST ${foodLocations[i].x}, ${foodLocations[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
+    nearestFoods.push([nearestFood,foodLocations[i]])
+  }
+
+  return nearestFoods
 }

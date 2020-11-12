@@ -2,7 +2,7 @@
 //spot1 -> List[Int] : The first spot to calculate the distance
 //spot2 -> List[Int] : The second spot to calculate the distance
 function manhattenDistance(point1,point2) {
-    return Math.abs(point1[0]-point2[0])+Math.abs(point1[0]-point2[0])
+    return Math.abs(point1[0]-point2[0])+Math.abs(point1[1]-point2[1])
 }
 
 
@@ -30,18 +30,11 @@ function buildKDTree(food,depth=0) {
     let sortedFood = food.sort((a,b)=>getAxis(a,axis)-getAxis(b,axis))
 
     return  {
-                left : buildKDTree(sortedFood.slice(0,Math.floor(len/2)),depth),
+                left : buildKDTree(sortedFood.slice(0,Math.floor(len/2)),depth+1),
                 spot : sortedFood[Math.floor(len/2)],
-                right : buildKDTree(sortedFood.slice(Math.floor(len/2)+1),depth)
+                right : buildKDTree(sortedFood.slice(Math.floor(len/2)+1),depth+1)
             }
 
-}
-
-function distance(p1,p2) {
-    var dx = p1[0]-p2[0]
-    var dy = p1[1]-p2[1]
-
-    return Math.abs(dx)+Math.abs(dy)
 }
 
 
@@ -68,7 +61,7 @@ function kdTreeClostestPoint(root,point,depth=0) {
     }
 
     let best = closerToPivot(point,kdTreeClostestPoint(nextBranch,point,depth+1),root.spot)
-    if (distance(point,[best.i,best.j])> Math.abs(point[axis]-getAxis(root.spot,axis))) {
+    if (manhattenDistance(point,[best.i,best.j])> Math.abs(point[axis]-getAxis(root.spot,axis))) {
         best = closerToPivot(point,kdTreeClostestPoint(oppositeBranch,point,depth+1),best)
     }
     
