@@ -19,7 +19,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         if(grid[headX-1][headY].counted == false){openSquaresLeft++; grid[headX-1][headY].counted = true};
         openSquaresLeft += countSquares(headX-1, headY, grid);
         console.log('Two Move: Left Checked, and squares found = '+openSquaresLeft);
-        if(openSquaresLeft === 0){
+        if(openSquaresLeft === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
     }
@@ -29,7 +29,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         if(grid[headX+1][headY].counted == false){openSquaresRight++; grid[headX+1][headY].counted = true};
         openSquaresRight += countSquares(headX+1, headY, grid);
         console.log('Two Move: Right Checked , and squares found = '+openSquaresRight);
-        if(openSquaresRight === 0){
+        if(openSquaresRight === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
     }
@@ -39,7 +39,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         if(grid[headX][headY+1].counted == false){openSquaresUp++; grid[headX][headY+1].counted = true};
         openSquaresUp += countSquares(headX, headY+1, grid);
         console.log('Two Move: Up Checked, and squares found = '+openSquaresUp);
-        if(openSquaresUp === 0){
+        if(openSquaresUp === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
     }
@@ -49,12 +49,25 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         if(grid[headX][headY-1].counted == false){openSquaresDown++; grid[headX][headY-1].counted = true};
         openSquaresDown += countSquares(headX, headY-1, grid);
         console.log('Two Move: Down Checked, and squares found = '+openSquaresDown);
-        if(openSquaresDown === 0){
+        if(openSquaresDown === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
     }
 
     openSquaresArr = [openSquaresLeft, openSquaresRight, openSquaresUp, openSquaresDown];
+
+    if(openSquaresLeft != 0 && openSquaresRight === 0 && openSquaresUp === 0 && openSquaresDown === 0){
+        return 'useAStar';
+    }
+    if(openSquaresLeft === 0 && openSquaresRight != 0 && openSquaresUp === 0 && openSquaresDown === 0){
+        return 'useAStar';
+    }
+    if(openSquaresLeft === 0 && openSquaresRight === 0 && openSquaresUp != 0 && openSquaresDown === 0){
+        return 'useAStar';
+    }
+    if(openSquaresLeft === 0 && openSquaresRight === 0 && openSquaresUp === 0 && openSquaresDown != 0){
+        return 'useAStar';
+    }
 
     var mostSquares = openSquaresArr[0];
     console.log('Most Squares: '+mostSquares);

@@ -45,7 +45,7 @@ function handleMove(request, response) {
   //movesArray is an array of ['move', number of moves, left(false/true), right(false/true), up(false/true), down(false/true)]
   var movesArray = availableMoves.possibleMoves(gameData);
 
-  if(movesArray[1] === 2){
+  if(movesArray[1] === 2 || movesArray[1] === 3){
     //two move algorithm
     console.log('Two Move Algorithm');
     move = twoMoveAlgorithm.algorithm(gameData, grid, movesArray);
@@ -58,7 +58,7 @@ function handleMove(request, response) {
       }
     }
 
-  } else if (movesArray[1] === 3 || movesArray[1] === 4){
+  } else if (movesArray[1] === 4){
     console.log('A* Algorithm');
     move = aStar.aStar(gameData, grid);
     if(move == 'noPath'){
