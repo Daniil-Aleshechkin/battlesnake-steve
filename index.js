@@ -164,6 +164,11 @@ function generateGrid(gameState){
   for(var x = 0; x < gameState.board.snakes.length; x++){
     for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
       grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].wall = true
+      if (y == 0 && gameState.board.snakes[x].length > gameState.you.body.length) {
+        for (var i = 0; i < 4; i++) {
+          grid[gameState.board.snakes[x].body[0].x][gameState.board.snakes[x].body[0].y].neighbours[i].wall = true
+        }
+      }
       //if(this.i === gameState.board.snakes[x].body[y].x && this.j === gameState.board.snakes[x].body[y].y){
         //this.wall = true;
       //}
