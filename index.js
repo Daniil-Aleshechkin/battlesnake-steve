@@ -47,7 +47,11 @@ function handleMove(request, response) {
   //movesArray is an array of ['move', number of moves, left(false/true), right(false/true), up(false/true), down(false/true)]
   var movesArray = availableMoves.possibleMoves(gameData);
   //genarate an array of the nearest paths of food
-  var nearestFoods = generateFoods(gameData);
+  if (gameData.board.food.length > 1)
+    var nearestFoods = generateFoods(gameData);
+  else {
+    var nearestFoods = null
+  }
 
   if(movesArray[1] === 2){
     //two move algorithm
@@ -173,18 +177,13 @@ function removeFromArray(arr, element){
 }
 
 function generateFoods(gameData) {
-  const foodLocations = JSON.parse(JSON.stringify(gameData.board.food))
   var nearestFoods = []
-  for(let i = 0; i < foodLocations.length; i++) {
-    var newFood = JSON.parse(JSON.stringify(foodLocations))
-    if (foodLocations.length <= 1) {
-      break
-    }
-    removeFromArray(newFood,foodLocations[i])
-    let tree = kdTree.buildKDTree(newFood)
-    let nearestFood = kdTree.kdTreeClostestPoint(tree,[foodLocations[i].x,foodLocations[i].y])
-    console.log(`NEAREST ${foodLocations[i].x}, ${foodLocations[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
-    nearestFoods.push([nearestFood,foodLocations[i]])
+  for(let i = 0; i < gameData.board.food.length; i++) {
+    let tree = kdTree.buildKDTree(gameData.board.food)
+    kdTreeRemoveElem(tree,gameData.board.food[i])
+    let nearestFood = kdTree.kdTreeClostestPoint(tree,[gameData.board.food[i].x,gameData.board.food[i].y])
+    console.log(`NEAREST ${gameData.board.food[i].x}, ${gameData.board.food[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
+    nearestFoods.push([nearestFood,gameData.board.food[i]])
   }
 
   return nearestFoods
