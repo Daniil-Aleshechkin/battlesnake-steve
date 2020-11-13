@@ -21,7 +21,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         
         openSquaresLeft += countSquares(headX-1, headY, grid, maxSquares);
         console.log('Two Move: Left Checked, and squares found = '+openSquaresLeft);
-        if(openSquaresLeft === 0){
+        if(openSquaresLeft === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
     }
@@ -32,7 +32,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         let maxSquares = gameState.you.body.length
         openSquaresRight += countSquares(headX+1, headY, grid, maxSquares);
         console.log('Two Move: Right Checked , and squares found = '+openSquaresRight);
-        if(openSquaresRight === 0){
+        if(openSquaresRight === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
     }
@@ -43,7 +43,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         let maxSquares = gameState.you.body.length
         openSquaresUp += countSquares(headX, headY+1, grid, maxSquares);
         console.log('Two Move: Up Checked, and squares found = '+openSquaresUp);
-        if(openSquaresUp === 0){
+        if(openSquaresUp === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
     }
@@ -54,7 +54,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         let maxSquares = gameState.you.body.length
         openSquaresDown += countSquares(headX, headY-1, grid,maxSquares);
         console.log('Two Move: Down Checked, and squares found = '+openSquaresDown);
-        if(openSquaresDown === 0){
+        if(openSquaresDown === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
     }
@@ -104,7 +104,7 @@ function countSquares(x, y, grid, maxSquares){
             squareCount++;
             grid[x][y].neighbours[a].counted = true;
             squareCount += countSquares(grid[x][y].neighbours[a].i, grid[x][y].neighbours[a].j, grid);
-            if (squareCount>=maxSquares) {return maxSquares}
+            if (squareCount>=(2*maxSquares)) {return maxSquares}
         }
     }
     return squareCount;

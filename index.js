@@ -53,7 +53,7 @@ function handleMove(request, response) {
     var nearestFoods = null
   }
 
-  if(movesArray[1] === 2){
+  if(movesArray[1] === 2 || movesArray[1] === 3){
     //two move algorithm
     console.log('Two Move Algorithm');
     move = twoMoveAlgorithm.algorithm(gameData, grid, movesArray);
@@ -66,7 +66,7 @@ function handleMove(request, response) {
       }
     }
 
-  } else if (movesArray[1] === 3 || movesArray[1] === 4){
+  } else if (movesArray[1] === 4){
     console.log('A* Algorithm');
     move = aStar.aStar(gameData, grid,nearestFoods);
     if(move == 'noPath'){
