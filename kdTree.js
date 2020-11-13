@@ -2,7 +2,12 @@
 //spot1 -> List[Int] : The first spot to calculate the distance
 //spot2 -> List[Int] : The second spot to calculate the distance
 function manhattenDistance(point1,point2) {
-    return Math.abs(point1[0]-point2[0])+Math.abs(point1[1]-point2[1])
+    let dist = Math.abs(point1[0]-point2[0])+Math.abs(point1[1]-point2[1])
+    if (point1[0]==point2[0]&&point2[1]==point2[1]) {
+        return Infinity
+    } else {
+        return dist
+    }
 }
 
 
@@ -25,7 +30,6 @@ function buildKDTree(food,depth=0) {
     if (len <=0) {
         return null
     }
-
     let axis = depth % 2
     let sortedFood = food.sort((a,b)=>getAxis(a,axis)-getAxis(b,axis))
 
@@ -50,7 +54,6 @@ function kdTreeClostestPoint(root,point,depth=0) {
 
     let nextBranch = null
     let oppositeBranch = null
-
     //Binary search the first candidate
     if (point[axis] < getAxis(root.spot,axis)) {
         nextBranch = root.left
