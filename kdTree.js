@@ -1,8 +1,13 @@
 //Returns the manhatten distance between two spots
-//spot1 -> Spot : The first spot to calculate the distance
-//spot2 -> Spot : The second spot to calculate the distance
-function manhattenDistance(spot1,spot2) {
-    return Math.abs(spot1.x-spot2.x)+Math.abs(spot1.y-spot2.y)
+//spot1 -> List[Int] : The first spot to calculate the distance
+//spot2 -> List[Int] : The second spot to calculate the distance
+function manhattenDistance(point1,point2) {
+    let dist = Math.abs(point1[0]-point2[0])+Math.abs(point1[1]-point2[1])
+    if (point1[0]==point2[0]&&point2[1]==point2[1]) {
+        return Infinity
+    } else {
+        return dist
+    }
 }
 
 
@@ -25,17 +30,17 @@ function buildKDTree(food,depth=0) {
     if (len <=0) {
         return null
     }
-
     let axis = depth % 2
     let sortedFood = food.sort((a,b)=>getAxis(a,axis)-getAxis(b,axis))
 
     return  {
-                left : buildKDTree(sortedFood.slice(0,Math.floor(len/2)),depth),
-                food : sortedFood[Math.floor(len/2)],
-                right : buildKDTree(sortedFood.slice(Math.floor(len/2)+1),depth)
+                left : buildKDTree(sortedFood.slice(0,Math.floor(len/2)),depth+1),
+                spot : sortedFood[Math.floor(len/2)],
+                right : buildKDTree(sortedFood.slice(Math.floor(len/2)+1),depth+1)
             }
 
 }
+
 
 //Returns the nearest point of from a given KD-Tree
 //root -> KD-Tree[Spot] : The KD-Tree to search the food
@@ -49,7 +54,6 @@ function kdTreeClostestPoint(root,point,depth=0) {
 
     let nextBranch = null
     let oppositeBranch = null
-
     //Binary search the first candidate
     if (point[axis] < getAxis(root.spot,axis)) {
         nextBranch = root.left
@@ -60,14 +64,17 @@ function kdTreeClostestPoint(root,point,depth=0) {
     }
 
     let best = closerToPivot(point,kdTreeClostestPoint(nextBranch,point,depth+1),root.spot)
-
-
+    if (manhattenDistance(point,[best.i,best.j])> Math.abs(point[axis]-getAxis(root.spot,axis))) {
+        best = closerToPivot(point,kdTreeClostestPoint(oppositeBranch,point,depth+1),best)
+    }
+    
+    return best
 }
 
 //Returns the distance closest to a pivot
 //pivot -> List[Int] : The pivot to compare the food
-//spot1 -> Spot : The first spot to compare
-//spot2 -> Spot : The second spot to compare
+//spot1 -> {x:,y:} : The first spot to compare
+//spot2 -> {x:,y:} : The second spot to compare
 function closerToPivot(pivot,spot1,spot2) {
     if (spot1 == null) {
         return spot2
@@ -83,13 +90,12 @@ function closerToPivot(pivot,spot1,spot2) {
     } else {
         return spot2
     }
-
 }
 
 //Return the minimun of 3 points according to an axis
-//p1 -> Spot : First point to compare
-//p2 -> Spot : Second point to compare
-//p3 -> Spot : Third point to compare
+//p1 -> {x:,y:} : First point to compare
+//p2 -> {x:,y:} : Second point to compare
+//p3 -> {x:,y:} : Third point to compare
 //axis -> Int : Axis to comapare the points
 function minimun (p1,p2,p3,axis) {
     if (p1 == null) {
@@ -144,7 +150,7 @@ function findMin(root,axis,depth=0) {
 
 //Removes a spot from a KD-tree
 //root -> KD-Tree[Spot] : Base KD-Tree
-//spot -> Spot : Food to remove
+//spot -> {x:,y:} : Food to remove
 //depth -> Int : Depth of the Kd-Tree
 function kdTreeRemoveElem(root,spot,depth=0) {
     if (root == null) {
@@ -152,12 +158,11 @@ function kdTreeRemoveElem(root,spot,depth=0) {
     }
 
     let axis = depth%2
-
-    if (root.spot == spot) {
+    if (root.spot.x == spot.x && root.spot.y == spot.y) {
         //Spot is found
         if (root.right != null) { // Replace the spot with the min from the tree
             root.spot = findMin(root,axis,depth)
-            root.right = kdTreeRemoveElem(root.right,dot,depth+1)
+            root.right = kdTreeRemoveElem(root.right,spot,depth+1)
         } else if (root.left != null) {
             root.spot = findMin(root,axis,depth)
             root.right = kdTreeRemoveElem(root.left,spot,depth+1)
@@ -169,6 +174,7 @@ function kdTreeRemoveElem(root,spot,depth=0) {
     } else {
         root.right = kdTreeRemoveElem(root.right,spot,depth+1)
     }
+    return root
 }
 
 
