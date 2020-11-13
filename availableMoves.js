@@ -1,4 +1,9 @@
 //If there is no possible path for the snake to go to a piece of food, this function will return it a safe move to make if possible.
+//Changed availableMoves to make its judgement based on walls from the grid, instead of open squares beside it.
+//The reason for this change is
+//  1. More efficient
+//  2. There are now walls that aren't really walls. What I'm referring to is the artificial walls created by avoiding head collision. 
+//     So now we want to base Steve's available moves off of the walls determined in the grid.s 
 function availableMoves(gameState, grid){
     var left = true;
     var right = true;

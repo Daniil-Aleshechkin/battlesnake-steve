@@ -1,4 +1,5 @@
 //If there is no possible path for the snake to go to a piece of food, this function will return it a safe move to make if possible.
+//Note: This is just the old 'availableMoves.js'.
 function lastResortMove(gameState){
     var left = true;
     var right = true;

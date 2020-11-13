@@ -67,14 +67,19 @@ function handleMove(request, response) {
     var nearestFoods = null
   }
 
+  //When Steve has two or three moves, we want to use the 'two move' algorithm. This algorithm checks all the available squares for each move, if necessary.
+  //Note: Steves priority is always moving where there are more squares. Even if food is right beside him, 'two move' algorithm has the highest precedence.
   if(movesArray[1] === 2 || movesArray[1] === 3){
     //two move algorithm
     console.log('Two Move Algorithm');
 
     move = twoMoveAlgorithm.algorithm(gameData, grid, movesArray);
+    //If the 'two move' algorithm determines that multiple moves are acceptable, A* pathfinding will be used.
     if(move == 'useAStar'){
       console.log('Two Move not necessary, use AStar');
       move = aStar.aStar(gameData, grid,nearestFoods);
+      //If A* pathfinding finds no possible path to the piece of food it is checking, it will return no path and make a last resort move.
+      //Last resort move simply just looks at what moves wont kill Steve on the next move, and makes a move from whatever choices it has.
       if(move == 'noPath'){
         console.log('A* Algorithm No Path');
         movesArray = lastResortMove.lastResort(gameData);
@@ -82,6 +87,7 @@ function handleMove(request, response) {
       }
     }
 
+    //On the first move, Steve has 4 possible moves. He will go directly to using A* pathfinding.
   } else if (movesArray[1] === 4){
     console.log('A* Algorithm');
     move = aStar.aStar(gameData, grid,nearestFoods);
@@ -91,9 +97,14 @@ function handleMove(request, response) {
       move = movesArray[0];
     }
 
+    //If Steve has 1 move, determined by availableMoves, he will use the only move determined by availableMoves.
   } else if(movesArray[1] === 1){
     console.log('One Move');
     move = movesArray[0];
+    
+    //If Steve has no moves according to availableMoves, he will then use whatever move lastResortMove determines.
+    //Sometimes Steve might have a move even though availableMoves says he doesn't. This is because availableMoves considers walls that aren't really there (which is intended)
+    //The walls 'that arent really there' are the walls created by a snake having more health than Steve, and surrounding that snakes head are walls 'that arent really there'.
   } else {
     console.log('One Move secondary');
     movesArray = lastResortMove.lastResort(gameData);
