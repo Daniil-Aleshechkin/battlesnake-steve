@@ -5,6 +5,8 @@ const availableMoves = require('./availableMoves')
 const twoMoveAlgorithm = require('./twoMoveAlgorithm')
 const kdTree = require("./kdTree")
 const { kdTreeRemoveElem, buildKDTree } = require('./kdTree')
+const lastResortMove = require('./lastResortMove')
+const foodRemoval = require('./foodRemoval')
 
 const PORT = process.env.PORT || 3000
 
@@ -31,7 +33,6 @@ function handleIndex(request, response) {
 
 function handleStart(request, response) {
   var gameData = request.body
-  console.log(gameData.board.food)
 
   console.log('START')
   response.status(200).send('ok')
@@ -43,9 +44,22 @@ function handleMove(request, response) {
 
   console.log('Current move #: '+gameData.turn);
   var grid = generateGrid(gameData);
+
+  //Remove a piece of food from the array of food if it is considered to be on a wall tile. 
+  //This occurs when Steves health is less than an enemies health, and that enemy is beside a piece food.
+  for(var x = 0; x < gameData.board.snakes.length; x++){
+    if((gameData.board.snakes[x].length >= gameData.you.body.length) && (gameData.board.snakes[x].id != gameData.you.id)){
+      gameData.board.food = foodRemoval.removeFood(gameData, grid);
+      console.log('bruh')
+    }
+  }
+  
+
+  console.log(gameData.board.food)
+
   
   //movesArray is an array of ['move', number of moves, left(false/true), right(false/true), up(false/true), down(false/true)]
-  var movesArray = availableMoves.possibleMoves(gameData);
+  var movesArray = availableMoves.possibleMoves(gameData, grid);
   //genarate an array of the nearest paths of food
   if (gameData.board.food.length > 1)
     var nearestFoods = generateFoods(gameData);
@@ -56,12 +70,14 @@ function handleMove(request, response) {
   if(movesArray[1] === 2 || movesArray[1] === 3){
     //two move algorithm
     console.log('Two Move Algorithm');
+
     move = twoMoveAlgorithm.algorithm(gameData, grid, movesArray);
     if(move == 'useAStar'){
       console.log('Two Move not necessary, use AStar');
       move = aStar.aStar(gameData, grid,nearestFoods);
       if(move == 'noPath'){
         console.log('A* Algorithm No Path');
+        movesArray = lastResortMove.lastResort(gameData);
         move = movesArray[0];
       }
     }
@@ -71,19 +87,18 @@ function handleMove(request, response) {
     move = aStar.aStar(gameData, grid,nearestFoods);
     if(move == 'noPath'){
       console.log('A* Algorithm No Path');
+      movesArray = lastResortMove.lastResort(gameData);
       move = movesArray[0];
     }
 
-  } else {
+  } else if(movesArray[1] === 1){
     console.log('One Move');
     move = movesArray[0];
+  } else {
+    console.log('One Move secondary');
+    movesArray = lastResortMove.lastResort(gameData);
+      move = movesArray[0];
   }
-
-  //If there is no possible path between the snake and the food, then just move right. Eventually will add a 
-  //function to handle a move here. Likely just move wherever there is no snake(if applicable).
-  // if(move == 'noPath'){
-  //   move = noPathMove.noPath(gameData);
-  // }
 
   console.log('MOVE: ' + move)
   response.status(200).send({
@@ -119,7 +134,11 @@ function generateGrid(gameState){
     this.previous = undefined;
     this.wall = false;
     this.counted = false;
+
+    //Is this.food ever used?
     this.food = null
+
+    this.foodPiece = false;
     
     //If the node is either an enemy snake, or its own body, count as a wall.
     
@@ -154,35 +173,28 @@ function generateGrid(gameState){
     }
   }
 
+  //Grid spots which are occupied by Steve, are set as walls
   for(var x = 0; x < gameState.you.body.length; x++){
     grid[gameState.you.body[x].x][gameState.you.body[x].y].wall = true
-
-    //if(this.i === gameState.you.body[x].x && this.j ===  gameState.you.body[x].y){
-      //this.wall = true;
-    //}
   }
+
+  //Grid spots which are occupied by enemy snakes, are set as walls
   for(var x = 0; x < gameState.board.snakes.length; x++){
     for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
-      grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].wall = true
-      if (y == 0 && gameState.board.snakes[x].length > gameState.you.body.length) {
-        for (var i = 0; i < 4; i++) {
-          grid[gameState.board.snakes[x].body[0].x][gameState.board.snakes[x].body[0].y].neighbours[i].wall = true
-        }
-      }
-      //if(this.i === gameState.board.snakes[x].body[y].x && this.j === gameState.board.snakes[x].body[y].y){
-        //this.wall = true;
-      //}
+        grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].wall = true;
+        //If.... 1. The head is being checked. 
+        //       2. The snakes health is greater than or equal to yours. 
+        //       3. The snake being checked is not steve himself.
+        if (y === 0 && (gameState.board.snakes[x].length >= gameState.you.body.length) && (gameState.board.snakes[x].id != gameState.you.id)) {
+          //Changed below for statement from i < 4, because if the enemy snake is at the border, they do not have 4 neighbours. 
+          for (var i = 0; i < grid[gameState.board.snakes[x].body[0].x][gameState.board.snakes[x].body[0].y].neighbours.length; i++) {
+            grid[gameState.board.snakes[x].body[0].x][gameState.board.snakes[x].body[0].y].neighbours[i].wall = true;
+         }
+      }     
     }
   }
-  return grid;
-}
 
-function removeFromArray(arr, element){
-  for(var i = arr.length - 1; i >= 0; i--){
-    if(arr[i].x == element.x && arr[i].y == element.y){
-      arr.splice(i, 1);
-    }
-  }
+  return grid;
 }
 
 function generateFoods(gameData) {
@@ -191,7 +203,7 @@ function generateFoods(gameData) {
     let tree = kdTree.buildKDTree(gameData.board.food)
     kdTreeRemoveElem(tree,gameData.board.food[i])
     let nearestFood = kdTree.kdTreeClostestPoint(tree,[gameData.board.food[i].x,gameData.board.food[i].y])
-    console.log(`NEAREST ${gameData.board.food[i].x}, ${gameData.board.food[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
+    //console.log(`NEAREST ${gameData.board.food[i].x}, ${gameData.board.food[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
     nearestFoods.push([nearestFood,gameData.board.food[i]])
   }
 

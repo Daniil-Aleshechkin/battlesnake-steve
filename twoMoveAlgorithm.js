@@ -21,7 +21,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         
         openSquaresLeft += countSquares(headX-1, headY, grid, maxSquares);
         console.log('Two Move: Left Checked, and squares found = '+openSquaresLeft);
-        if(openSquaresLeft === 0 && moveArray[1] === 2){
+        if(openSquaresLeft === 0 && moveArray[1] === 2 && gameState.board.food.length != 0){
             return 'useAStar';
         }
     }
@@ -32,7 +32,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         let maxSquares = gameState.you.body.length
         openSquaresRight += countSquares(headX+1, headY, grid, maxSquares);
         console.log('Two Move: Right Checked , and squares found = '+openSquaresRight);
-        if(openSquaresRight === 0 && moveArray[1] === 2){
+        if(openSquaresRight === 0 && moveArray[1] === 2 && gameState.board.food.length != 0){
             return 'useAStar';
         }
     }
@@ -43,34 +43,34 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         let maxSquares = gameState.you.body.length
         openSquaresUp += countSquares(headX, headY+1, grid, maxSquares);
         console.log('Two Move: Up Checked, and squares found = '+openSquaresUp);
-        if(openSquaresUp === 0 && moveArray[1] === 2){
+        if(openSquaresUp === 0 && moveArray[1] === 2 && gameState.board.food.length != 0){
             return 'useAStar';
         }
     }
 
-        //If the snake moving down is an option, calculate the squares in that direction.
+    //If the snake moving down is an option, calculate the squares in that direction.
     if(moveArray[5]){     
         if(grid[headX][headY-1].counted == false){openSquaresDown++; grid[headX][headY-1].counted = true};
         let maxSquares = gameState.you.body.length
         openSquaresDown += countSquares(headX, headY-1, grid,maxSquares);
         console.log('Two Move: Down Checked, and squares found = '+openSquaresDown);
-        if(openSquaresDown === 0 && moveArray[1] === 2){
+        if(openSquaresDown === 0 && moveArray[1] === 2 && gameState.board.food.length != 0){
             return 'useAStar';
         }
     }
 
     openSquaresArr = [openSquaresLeft, openSquaresRight, openSquaresUp, openSquaresDown];
 
-    if(openSquaresLeft != 0 && openSquaresRight === 0 && openSquaresUp === 0 && openSquaresDown === 0){
+    if(openSquaresLeft != 0 && openSquaresRight === 0 && openSquaresUp === 0 && openSquaresDown === 0 && gameState.board.food.length != 0){
         return 'useAStar';
     }
-    if(openSquaresLeft === 0 && openSquaresRight != 0 && openSquaresUp === 0 && openSquaresDown === 0){
+    if(openSquaresLeft === 0 && openSquaresRight != 0 && openSquaresUp === 0 && openSquaresDown === 0 && gameState.board.food.length != 0){
         return 'useAStar';
     }
-    if(openSquaresLeft === 0 && openSquaresRight === 0 && openSquaresUp != 0 && openSquaresDown === 0){
+    if(openSquaresLeft === 0 && openSquaresRight === 0 && openSquaresUp != 0 && openSquaresDown === 0 && gameState.board.food.length != 0){
         return 'useAStar';
     }
-    if(openSquaresLeft === 0 && openSquaresRight === 0 && openSquaresUp === 0 && openSquaresDown != 0){
+    if(openSquaresLeft === 0 && openSquaresRight === 0 && openSquaresUp === 0 && openSquaresDown != 0 && gameState.board.food.length != 0){
         return 'useAStar';
     }
 
@@ -88,7 +88,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
             needsAStar = false
         }
     }
-    if (needsAStar) {
+    if (needsAStar && gameState.board.food.length != 0) {
         return 'useAStar'
     }
     
@@ -117,7 +117,7 @@ function countSquares(x, y, grid, maxSquares){
             squareCount++;
             grid[x][y].neighbours[a].counted = true;
             squareCount += countSquares(grid[x][y].neighbours[a].i, grid[x][y].neighbours[a].j, grid);
-            if (squareCount>=(2*maxSquares)) {return maxSquares}
+            //if (squareCount>=(3*maxSquares)) {return maxSquares}
         }
     }
     return squareCount;
