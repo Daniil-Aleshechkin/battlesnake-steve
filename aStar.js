@@ -6,7 +6,7 @@ function shortestManhattenDistance(gameState,nearestFoods){
         var MHD;
         MHD = Math.abs(gameState.board.food[i].x - gameState.you.body[0].x) + Math.abs(gameState.board.food[i].y - gameState.you.body[0].y);
         if (nearestFoods != null && nearestFoods.length >1) {
-          MHD += Math.abs(nearestFoods[i][0].x-nearestFoods[i][1].x) + Math.abs(nearestFoods[i][0].y-nearestFoods[i][1].y);
+          MHD += (Math.abs(nearestFoods[i][0].x-nearestFoods[i][1].x) + Math.abs(nearestFoods[i][0].y-nearestFoods[i][1].y))*0.7;
         }
         if(i === 0){
             shortestMHDIndex = i;
