@@ -122,18 +122,6 @@ function generateGrid(gameState){
     this.food = null
     
     //If the node is either an enemy snake, or its own body, count as a wall.
-    for(var x = 0; x < gameState.you.body.length; x++){
-      if(this.i === gameState.you.body[x].x && this.j ===  gameState.you.body[x].y){
-        this.wall = true;
-      }
-    }
-    for(var x = 0; x < gameState.board.snakes.length; x++){
-      for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
-        if(this.i === gameState.board.snakes[x].body[y].x && this.j === gameState.board.snakes[x].body[y].y){
-          this.wall = true;
-        }
-      }
-    }
     
     this.addNeighbours = function(grid){
       if(i < cols - 1) {
@@ -163,6 +151,22 @@ function generateGrid(gameState){
   for(var i = 0; i < cols; i++){
     for(var j = 0; j < rows; j++){
       grid[i][j].addNeighbours(grid);
+    }
+  }
+
+  for(var x = 0; x < gameState.you.body.length; x++){
+    grid[gameState.you.body[x].x][gameState.you.body[x].y].wall = true
+
+    //if(this.i === gameState.you.body[x].x && this.j ===  gameState.you.body[x].y){
+      //this.wall = true;
+    //}
+  }
+  for(var x = 0; x < gameState.board.snakes.length; x++){
+    for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
+      grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].wall = true
+      //if(this.i === gameState.board.snakes[x].body[y].x && this.j === gameState.board.snakes[x].body[y].y){
+        //this.wall = true;
+      //}
     }
   }
   return grid;
