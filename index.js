@@ -5,7 +5,6 @@ const availableMoves = require('./availableMoves')
 const twoMoveAlgorithm = require('./twoMoveAlgorithm')
 const kdTree = require("./kdTree")
 const { kdTreeRemoveElem, buildKDTree } = require('./kdTree')
-const hamPath = require('./hammiltonianPath')
 
 const PORT = process.env.PORT || 3000
 
@@ -44,8 +43,6 @@ function handleMove(request, response) {
 
   console.log('Current move #: '+gameData.turn);
   var grid = generateGrid(gameData);
-
-  console.log(hamPath.aStarToPoint(grid, [gameData.you.body[0].x,gameData.you.body[0].y], [0, 0]));
   
   //movesArray is an array of ['move', number of moves, left(false/true), right(false/true), up(false/true), down(false/true)]
   var movesArray = availableMoves.possibleMoves(gameData);
@@ -56,29 +53,31 @@ function handleMove(request, response) {
     var nearestFoods = null
   }
 
+  
+
   if(movesArray[1] === 2 || movesArray[1] === 3){
     //two move algorithm
-    //console.log('Two Move Algorithm');
+    console.log('Two Move Algorithm');
     move = twoMoveAlgorithm.algorithm(gameData, grid, movesArray);
     if(move == 'useAStar'){
-      //console.log('Two Move not necessary, use AStar');
+      console.log('Two Move not necessary, use AStar');
       move = aStar.aStar(gameData, grid,nearestFoods);
       if(move == 'noPath'){
-        //console.log('A* Algorithm No Path');
+        console.log('A* Algorithm No Path');
         move = movesArray[0];
       }
     }
 
   } else if (movesArray[1] === 4){
-    //console.log('A* Algorithm');
+    console.log('A* Algorithm');
     move = aStar.aStar(gameData, grid,nearestFoods);
     if(move == 'noPath'){
-      //console.log('A* Algorithm No Path');
+      console.log('A* Algorithm No Path');
       move = movesArray[0];
     }
 
   } else {
-    //console.log('One Move');
+    console.log('One Move');
     move = movesArray[0];
   }
 
@@ -166,7 +165,7 @@ function generateGrid(gameState){
   for(var x = 0; x < gameState.board.snakes.length; x++){
     for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
       grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].wall = true
-      grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].age = gameState.board.snakes[x].body.length-y
+      grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].age = gameState.board.snakes[X].body.length-y
       if (y == 0 && gameState.board.snakes[x].length > gameState.you.body.length) {
         for (var i = 0; i < 4; i++) {
           grid[gameState.board.snakes[x].body[0].x][gameState.board.snakes[x].body[0].y].neighbours[i].wall = true //Not sure what to do with the ages on potential dangers for now I will leave it as 0
@@ -191,7 +190,7 @@ function generateFoods(gameData) {
     let tree = kdTree.buildKDTree(gameData.board.food)
     kdTreeRemoveElem(tree,gameData.board.food[i])
     let nearestFood = kdTree.kdTreeClostestPoint(tree,[gameData.board.food[i].x,gameData.board.food[i].y])
-    //console.log(`NEAREST ${gameData.board.food[i].x}, ${gameData.board.food[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
+    console.log(`NEAREST ${gameData.board.food[i].x}, ${gameData.board.food[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
     nearestFoods.push([nearestFood,gameData.board.food[i]])
   }
 
