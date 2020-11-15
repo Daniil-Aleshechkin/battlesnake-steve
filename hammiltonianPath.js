@@ -85,7 +85,8 @@ function aStarToPoint(grid,pointA,pointB) {
     var closed = []
 
     open.push(grid[pointA[0]][pointA[1]])
-    
+    open[0].previous = undefined;
+
     while (open.length > 0) {
 
         var lowestFCost = 0
@@ -96,25 +97,22 @@ function aStarToPoint(grid,pointA,pointB) {
         }
         var current = open[lowestFCost]
 
-        //console.log("Current X: " + current.x + "Current Y: " + current.y + "point b X: " + pointB[0] + "point b Y: " + pointB[1])
         if (current.i===pointB[0] && current.j === pointB[1]) {
             var path = []
             var pathPoint = current
             
-            path.push(pathPoint)
             while (pathPoint.previous) {
-                path.push(pathPoint)
+                path.push([pathPoint.i, pathPoint.j])
                 pathPoint = pathPoint.previous   
             }
+            path.push(pointA)
 
             return path
         }
 
         var neighbours = current.neighbours
-
-        console.log("test")
         for (let i = 0; i < neighbours.length; i++) {
-            if (!closed.includes(neighbours[i]) && !(neighbours[i].wall)) { //accounting for the ages
+            if (!closed.includes(neighbours[i]) && !neighbours[i].wall && neighbours[i].age < hCost([neighbours[i].i, neighbours[i].j],pointA)) { //accounting for the ages
                 var neighboorG = current.g + 1
 
                 if (open.includes(neighbours[i])) {

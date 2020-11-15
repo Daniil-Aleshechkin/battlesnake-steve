@@ -20,7 +20,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         let maxSquares = gameState.you.body.length
         
         openSquaresLeft += countSquares(headX-1, headY, grid, maxSquares);
-        console.log('Two Move: Left Checked, and squares found = '+openSquaresLeft);
+        //console.log('Two Move: Left Checked, and squares found = '+openSquaresLeft);
         if(openSquaresLeft === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
@@ -42,7 +42,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         if(grid[headX][headY+1].counted == false){openSquaresUp++; grid[headX][headY+1].counted = true};
         let maxSquares = gameState.you.body.length
         openSquaresUp += countSquares(headX, headY+1, grid, maxSquares);
-        console.log('Two Move: Up Checked, and squares found = '+openSquaresUp);
+        //console.log('Two Move: Up Checked, and squares found = '+openSquaresUp);
         if(openSquaresUp === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
@@ -53,7 +53,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         if(grid[headX][headY-1].counted == false){openSquaresDown++; grid[headX][headY-1].counted = true};
         let maxSquares = gameState.you.body.length
         openSquaresDown += countSquares(headX, headY-1, grid,maxSquares);
-        console.log('Two Move: Down Checked, and squares found = '+openSquaresDown);
+        //console.log('Two Move: Down Checked, and squares found = '+openSquaresDown);
         if(openSquaresDown === 0 && moveArray[1] === 2){
             return 'useAStar';
         }
@@ -76,7 +76,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
 
     var mostSquares = openSquaresArr[0];
     var needsAStar = true
-    console.log('Most Squares: '+mostSquares);
+    //console.log('Most Squares: '+mostSquares);
     for(var z = 0; z < openSquaresArr.length - 1; z++){
         if((openSquaresArr[z] < openSquaresArr[z+1]) && (openSquaresArr[z+1] > mostSquares)){
             mostSquares = openSquaresArr[z+1];
@@ -92,7 +92,7 @@ function twoMoveAlgoritm(gameState, grid, moveArray){
         return 'useAStar'
     }
     
-    console.log('Most Squares: '+mostSquares);
+    //console.log('Most Squares: '+mostSquares);
     if(mostSquares === openSquaresLeft){
         return 'left';
     }

@@ -54,17 +54,17 @@ function handleMove(request, response) {
     var nearestFoods = null
   }
 
-  console.log(hamPath.aStarToPoint(grid, [gameData.you.body[0].x,gameData.you.body[0].y], [0, 0]));
+  console.log(hamPath.aStarToPoint(grid, [2,2], [0, 0]));
 
   if(movesArray[1] === 2 || movesArray[1] === 3){
     //two move algorithm
-    console.log('Two Move Algorithm');
+    //console.log('Two Move Algorithm');
     move = twoMoveAlgorithm.algorithm(gameData, grid, movesArray);
     if(move == 'useAStar'){
-      console.log('Two Move not necessary, use AStar');
+      //console.log('Two Move not necessary, use AStar');
       move = aStar.aStar(gameData, grid,nearestFoods);
       if(move == 'noPath'){
-        console.log('A* Algorithm No Path');
+        //console.log('A* Algorithm No Path');
         move = movesArray[0];
       }
     }
@@ -73,12 +73,12 @@ function handleMove(request, response) {
     console.log('A* Algorithm');
     move = aStar.aStar(gameData, grid,nearestFoods);
     if(move == 'noPath'){
-      console.log('A* Algorithm No Path');
+      //console.log('A* Algorithm No Path');
       move = movesArray[0];
     }
 
   } else {
-    console.log('One Move');
+    //console.log('One Move');
     move = movesArray[0];
   }
 
@@ -191,7 +191,7 @@ function generateFoods(gameData) {
     let tree = kdTree.buildKDTree(gameData.board.food)
     kdTreeRemoveElem(tree,gameData.board.food[i])
     let nearestFood = kdTree.kdTreeClostestPoint(tree,[gameData.board.food[i].x,gameData.board.food[i].y])
-    console.log(`NEAREST ${gameData.board.food[i].x}, ${gameData.board.food[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
+    //console.log(`NEAREST ${gameData.board.food[i].x}, ${gameData.board.food[i].y} IS ${nearestFood.x}, ${nearestFood.y}`)
     nearestFoods.push([nearestFood,gameData.board.food[i]])
   }
 
