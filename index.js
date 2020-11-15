@@ -4,6 +4,7 @@ const aStar = require('./aStar.js')
 const availableMoves = require('./availableMoves')
 const twoMoveAlgorithm = require('./twoMoveAlgorithm')
 const kdTree = require("./kdTree")
+const hamPath = require("./hammiltonianPath")
 const { kdTreeRemoveElem, buildKDTree } = require('./kdTree')
 
 const PORT = process.env.PORT || 3000
@@ -53,7 +54,7 @@ function handleMove(request, response) {
     var nearestFoods = null
   }
 
-  
+  console.log(hamPath.aStarToPoint(grid, [gameData.you.body[0].x,gameData.you.body[0].y], [0, 0]));
 
   if(movesArray[1] === 2 || movesArray[1] === 3){
     //two move algorithm
@@ -165,7 +166,7 @@ function generateGrid(gameState){
   for(var x = 0; x < gameState.board.snakes.length; x++){
     for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
       grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].wall = true
-      grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].age = gameState.board.snakes[X].body.length-y
+      grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].age = gameState.board.snakes[x].body.length-y
       if (y == 0 && gameState.board.snakes[x].length > gameState.you.body.length) {
         for (var i = 0; i < 4; i++) {
           grid[gameState.board.snakes[x].body[0].x][gameState.board.snakes[x].body[0].y].neighbours[i].wall = true //Not sure what to do with the ages on potential dangers for now I will leave it as 0
