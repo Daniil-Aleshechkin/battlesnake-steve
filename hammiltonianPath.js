@@ -11,7 +11,18 @@ function generateBasePath(grid,gameState,avaibleMoves) {
 function followPath (path,gameState) {
     for (let i = 0; i < path.length; i++) {
         if (i==path.length-1) { //quick and dirty sol to looping the path
-            i=-1   
+            if (path[0][0]-gameState.you.body[0].x==-1) {
+                return "left"
+            }
+            if (path[0][0]-gameState.you.body[0].x==1) {
+                return "right"
+            }
+            if (path[0][1]-gameState.you.body[0].y==1) {
+                return "up"
+            }
+            if (path[0][1]-gameState.you.body[0].y==-1) {
+                return "down"
+            }
         }
         if (path[i][0]==gameState.you.body[0].x&&path[i][1]==gameState.you.body[0].y) { //find the location on the path
             //make a move based on a genarated path
