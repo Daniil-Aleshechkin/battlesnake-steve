@@ -32,9 +32,14 @@ function followPath (path,gameState) {
 }
 
 function generatePath(grid,gameState,avaibleMoves) {
-    var path = generateBasePath(grid,gameState) //makes the first base of the path maybe not needed and the logic would be the same if we just push the your location to the path
+    var path = generateBasePath(grid,gameState,avaibleMoves) //makes the first base of the path maybe not needed and the logic would be the same if we just push the your location to the path
     if (path === []) {
         return path
+    }
+
+    for (let i = 0; i < path.length; i++) {
+        grid[path[i][0]][path[i][1]].wall = true
+        grid[path[i][0]][path[i][1]].age = Infinity
     }
 
     while (path.length < gameState.you.body.length) { // builds the path to the derised length
