@@ -55,11 +55,11 @@ function generatePath(grid,gameState,avaibleMoves) {
 
     while (path.length < gameState.you.body.length) { // builds the path to the derised length
         for (let i = 0; i < path.length-1; i++) {
-            let neighboors = grid[path[i][0]][path[i][1]].neighboors
+            let neighbours = grid[path[i][0]][path[i][1]].neighbours
             let addedPath = []
-            for (let j = 0; i < neighboors.length; j++) {
-                if (neighboors[j].age < hCost([gameState.you.body[0].x,gameState.you.body[1].y],[neighboors[j].x,neighboors[j].y])) {
-                    addedPath = aStarToPoint(grid,[neighboors[j].x],neighboors[j].y,path[i+1]) // Get a possible move and pathfind back to the path
+            for (let j = 0; i < neighbours.length; j++) {
+                if (neighbours[j].age < hCost([gameState.you.body[0].x,gameState.you.body[1].y],[neighbours[j].i,neighbours[j].j])) {
+                    addedPath = aStarToPoint(grid,[neighbours[j].i],neighbours[j].j,path[i+1]) // Get a possible move and pathfind back to the path
                 }
                 if (addedPath != []) {
                     break //If a path is found stop looking
@@ -84,54 +84,56 @@ function aStarToPoint(grid,pointA,pointB) {
     var open = []
     var closed = []
 
-    open.push(grid[pointA[0][pointA[1]]])
-    
-    var lowestFCost = 0
-    for (let i = 0; i < open.length; i++) {
-        if (open[lowestFCost] > open[i]) {
-            lowestFCost = i
-        }
-    }
-    var current = open[lowestFCost]
-    
-    open.splice(lowestFCost,1)
-    closed.push(current)
+    open.push(grid[pointA[0]][pointA[1]])
     
     while (open.length > 0) {
-        if (current.x===pointB[0] && current.y === pointB[1]) {
+
+        var lowestFCost = 0
+        for (let i = 0; i < open.length; i++) {
+            if (open[lowestFCost] > open[i]) {
+                 lowestFCost = i
+            }
+        }
+        var current = open[lowestFCost]
+
+        //console.log("Current X: " + current.x + "Current Y: " + current.y + "point b X: " + pointB[0] + "point b Y: " + pointB[1])
+        if (current.i===pointB[0] && current.j === pointB[1]) {
             var path = []
             var pathPoint = current
             
             path.push(pathPoint)
             while (pathPoint.previous) {
-                pathPoint = pathPoint.previous
                 path.push(pathPoint)
+                pathPoint = pathPoint.previous   
             }
 
             return path
         }
 
-        var neighboors = current.neighboors
+        var neighbours = current.neighbours
 
-        for (let i = 0; i < neighboors.length; i++) {
-            if (!closed.includes(neighboors[i]) && !(neighboors[i].wall && neighboors[i].age > hCost([neighboors[i].x,neighboors[i].y],pointA))) { //accounting for the ages
+        console.log("test")
+        for (let i = 0; i < neighbours.length; i++) {
+            if (!closed.includes(neighbours[i]) && !(neighbours[i].wall)) { //accounting for the ages
                 var neighboorG = current.g + 1
 
-                if (open.includes(neighboors[i])) {
-                    if (neighboorG < neighboors[i].g) {
-                        neighboors[i].g = neighboorG
+                if (open.includes(neighbours[i])) {
+                    if (neighboorG < neighbours[i].g) {
+                        neighbours[i].g = neighboorG
                     }
                 } else {
-                    neighboors[i].g = neighboorG
-                    open.push(neighboors[i])
+                    neighbours[i].g = neighboorG
+                    open.push(neighbours[i])
                 }
                 
-                neighboors[i].h = hCost([neighboors[i].x,neighboors[i].y],pointB)
-                neighboors[i].f = neighboors[i].h + neighboors[i].g
-                neighboors[i].previous = current
+                neighbours[i].h = hCost([neighbours[i].i,neighbours[i].j],pointB)
+                neighbours[i].f = neighbours[i].h + neighbours[i].g
+                neighbours[i].previous = current
             }
 
         }
+        open.splice(lowestFCost,1)
+        closed.push(current)
     }
     return []
 }
@@ -173,4 +175,4 @@ function updatePath(path,grid) {
     }
 }
 
-module.exports = {generatePath : generatePath,followPath :followPath, updatePath :updatePath}
+module.exports = {generatePath : generatePath,followPath :followPath, updatePath :updatePath, aStarToPoint:aStarToPoint}
