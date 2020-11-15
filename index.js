@@ -120,6 +120,7 @@ function generateGrid(gameState){
     this.wall = false;
     this.counted = false;
     this.food = null
+    this.age = 0
     
     //If the node is either an enemy snake, or its own body, count as a wall.
     
@@ -157,21 +158,17 @@ function generateGrid(gameState){
   for(var x = 0; x < gameState.you.body.length; x++){
     grid[gameState.you.body[x].x][gameState.you.body[x].y].wall = true
 
-    //if(this.i === gameState.you.body[x].x && this.j ===  gameState.you.body[x].y){
-      //this.wall = true;
-    //}
+    grid[gameState.you.body[x].x][gameState.you.body[x].y].age = gameState.you.body.length-x
   }
   for(var x = 0; x < gameState.board.snakes.length; x++){
     for(var y = 0; y < gameState.board.snakes[x].body.length; y++){
       grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].wall = true
+      grid[gameState.board.snakes[x].body[y].x][gameState.board.snakes[x].body[y].y].age = gameState.board.snakes[X].body.length-y
       if (y == 0 && gameState.board.snakes[x].length > gameState.you.body.length) {
         for (var i = 0; i < 4; i++) {
-          grid[gameState.board.snakes[x].body[0].x][gameState.board.snakes[x].body[0].y].neighbours[i].wall = true
+          grid[gameState.board.snakes[x].body[0].x][gameState.board.snakes[x].body[0].y].neighbours[i].wall = true //Not sure what to do with the ages on potential dangers for now I will leave it as 0
         }
       }
-      //if(this.i === gameState.board.snakes[x].body[y].x && this.j === gameState.board.snakes[x].body[y].y){
-        //this.wall = true;
-      //}
     }
   }
   return grid;
